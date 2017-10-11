@@ -16,7 +16,11 @@ Including another URLconf
 from django.conf.urls import url,include
 from django.contrib import admin
 from projects import urls as projecturls
+from risks import urls as caseurls
+
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^projects/', include(projecturls)),
+    url(r'^cases/', include(caseurls)),
 ]

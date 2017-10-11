@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>adding risks to case</title>
+</head>
+<body>
+    <h1> adding new risk</h1>
+    {% for risk in risks %}
+    <p> {{ risk }}   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="/cases/{{case.id}}/risks/edit/{{risk.id}}">
+        Edit </a>| | | <a href="/cases/{{case.id}}/risks/delete/{{risk.id}}"> Delete </a> </p>
+    {% endfor %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="save"/>
+    </form>
+    <a href="/cases/{{case.id}}/assign_tasks">Next</a>
+</body>
+</html>
