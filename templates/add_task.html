@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>adding tasks to project</title>
+</head>
+<body>
+    <h1> adding new project</h1>
+    {% for task in tasks %}
+    <p> {{ task }}   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="/projects/{{project.id}}/tasks/edit/{{task.id}}">
+        Edit </a>| | | <a href="/projects/{{project.id}}/tasks/delete/{{task.id}}"> Delete </a> </p>
+    {% endfor %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="save"/>
+    </form>
+    <a href="/projects/{{project.id}}/order">Next</a>
+</body>
+</html>
