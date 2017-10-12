@@ -1,5 +1,6 @@
 from django.db import models
 from projects.models import Project
+from projects.models import Task
 
 
 class Case(models.Model):
@@ -12,6 +13,12 @@ class Risk(models.Model):
     name = models.CharField(max_length=200)
     probability = models.FloatField()
     case = models.ForeignKey(Case)
+
+class Risk_task(models.Model):
+    task = models.ForeignKey(Task)
+    risk = models.ForeignKey(Risk)
+    duration = models.FloatField()
+    cost = models.FloatField()
 
 #
 # 	def claculate(self):

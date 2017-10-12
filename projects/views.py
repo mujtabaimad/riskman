@@ -44,7 +44,7 @@ def order(request,id):
         nextTasksFull = []
         for i in nextTasks:
             nextTasksFull.append({'id':i.task,'name':models.Task.objects.get(id=i.task_next).name})
-        print(nextTasksFull)
+        # print(nextTasksFull)
         return render(request,"order.html",{'tasks':tasks,'project':project,'nextTasks':nextTasksFull})
 
 

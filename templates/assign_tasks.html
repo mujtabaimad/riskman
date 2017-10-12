@@ -7,33 +7,41 @@
 <body>
 
 
-    {% for task in tasks %}
-    {% for next in nextTasks %}
-        {% if next.id == task.id %}
-            <p> - {{ next.name }}</p>
-        {% endif %}
-    {% endfor %}
-    <h4>{{task.name}}</h4>
-    {% if task.next_tasks %}
-        {% for next in task.next_tasks%}
-            <h5>next.name</h5>
+    {% for risk in risks %}
+        {% for a_task in assos_tasks %}
+            {% if a_task.risk.id == risk.id %}
+                <p> - {{ a_task.task.name }}</p>
+                <p> --- {{ a_task.duration }}</p>
+                <p> --- {{ a_task.cost }}</p>
+            {% endif %}
         {% endfor %}
-    {% endif %}
+    <h4>{{risk.name}}</h4>
+    <!--{% if assos_tasks %}-->
+        <!--{% for a_task in assos_tasks%}-->
+            <!--<h5>a.name</h5>-->
+        <!--{% endfor %}-->
+    <!--{% endif %}-->
     <br>
-         <select multiple id="task_{{task.id}}">
-             {% for task1 in tasks%}
-                {%  if not task1.id == task.id %}
-
-                    <option value="{{task1.id}}">{{task1.name}}</option>
-                 {% endif %}
+    <br>
+    {% for task1 in tasks%}
+    <!--<option value="{{task1.id}}">{{task1.name}}</option>-->
+    <h4>{{task1.name}}</h4>
+                <p>duration</p>
+                <input id="duration_{{risk.id}}_{{task1.id}}"/>
+                 <p>cost</p>
+                 <input id="cost_{{risk.id}}_{{task1.id}}"/>
+                 <button  onclick="update_order({{risk.id}},{{task1.id}})" >update</button>
+                 <br>
              {% endfor %}
          </select>
-        <br>
-        <button  onclick="update_order({{task.id}})" >update</button>
+    <br>
+
     <br>
     <br>
     <br>
     {% endfor %}
+
+    <a href="/cases/{{case.id}}/result">done</a>
     <script>
     function getSelectValues(select) {
           var result = [];
@@ -49,43 +57,14 @@
           }
           return result;
     }
-    function post(path, params, method) {
-        method = method || "post"; // Set method to post by default if not specified.
 
-        // The rest of this code assumes you are not using a library.
-        // It can be made less wordy if you use one.
-        var form = document.createElement("form");
-        form.setAttribute("method", method);
-        form.setAttribute("action", path);
-
-        for(var key in params) {
-            if(params.hasOwnProperty(key)) {
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", key);
-                hiddenField.setAttribute("value", params[key]);
-
-                form.appendChild(hiddenField);
-             }
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-    function update_order(id) {
-        console.log(11111111);
-        tasks = document.getElementById("task_"+id);
-        var e = document.getElementById("task_"+id);
-        var selected = getSelectValues(e);
-        console.log({id:id,next:selected});
+    function update_order(risk_id,task_id) {
+        var d = document.getElementById("duration_"+risk_id+"_"+task_id).value;
+        var c = document.getElementById("cost_"+risk_id+"_"+task_id).value;
         var http = new XMLHttpRequest();
-        var url = "/projects/order_task";
-        var params = "id="+id;
+        var url = "/cases/assign_task";
+        var params = "risk_id="+risk_id+"&task_id="+task_id+"&duration="+d+"&cost="+c;
         http.open("POST", url, true);
-        for(var i=0;i<selected.length;i++){
-            params+="&next="+selected[i];
-        }
-        //Send the proper header information along with the request
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
         http.onreadystatechange = function() {//Call a function when the state changes.
