@@ -103,31 +103,54 @@ def result(request,id):
         risks = case.risk_set.get_queryset()
         project = case.project
         tasks = project.task_set.get_queryset()
-        all = []
-        w = []
+        all = {}
+        total_cost = 0
         for kk in range(case.number_of_exe):
+        # for kk in range(10):
             new_tasks={}
+            i_cost = 0
             risks_to_mod = get_rand_risks(risks)
-            print(risks_to_mod)
-            for i in tasks:
-                nextTasks = mo.TaskNext.objects.filter(task__in=[i.id])
-                risks_task = models.Risk_task.objects.filter(task__in=[i.id])
-                for ll in risks_task:
-                    print('---',ll.risk.id)
-                print()
-                d = i.duration
-                c = i.cost
-                for j in risks_task:
-                    if j.risk.id in risks_to_mod:
-                        d+=j.duration
-                        c+=j.cost
-                new_tasks[str(i.id)]= {"duration":d,"cost":c,'next':nextTasks}
-                # print(i.name,nextTasks,"==================")
-            res = calc({'risks':risks,'case':case,'new_tasks':new_tasks,'root':tasks[0]})
-            w.append(res)
-            all.append({'tasks':tasks,'risks':risks,'case':case,'new_tasks':new_tasks,'root':tasks[0],'result':res,'mod':risks_to_mod})
+            selected_risks = [models.Risk.objects.get(id=i) for i in risks_to_mod]
+            #print(risks_to_mod)
+            if tuple(selected_risks) in all.keys():
+                total_cost+=all[tuple(selected_risks)]['cost']
+                all[tuple(selected_risks)]['count']+=1
+            else:
+                for i in tasks:
+                    nextTasks = mo.TaskNext.objects.filter(task__in=[i.id])
+                    risks_task = models.Risk_task.objects.filter(task__in=[i.id])
 
-        return render(request,"result.html",{'all':all,'worst_case':max(w)})
+                    d = i.duration
+                    c = i.cost
+                    i_cost+=i.cost
+                    total_cost+=i.cost
+                    for j in risks_task:
+                        if j.risk.id in risks_to_mod:
+                            d+=j.duration
+                            c+=j.cost
+                            i_cost+=j.cost
+                            total_cost+=j.cost
+                    new_tasks[str(i.id)]= {"duration":d,"cost":c,'next':nextTasks}
+                    # print(i.name,nextTasks,"==================")
+                res = calc({'new_tasks':new_tasks,'root':tasks[0]})
+
+                all[tuple(selected_risks)] = {'cost':i_cost,'result':res,'new_tasks':new_tasks,'count':1}
+
+        return render(request,"result.html",{
+                          'tasks':tasks,
+                          'risks':risks,
+                          'case':case,
+                          'root':tasks[0],
+                          'all':all,
+                          'worst_case_value':get_max(all)[1],
+                          'worst_case_cost':get_max(all)[2],
+                          'worst_case':get_max(all)[0],
+                          'most_case_value':get_max(all)[4],
+                          'most_case_cost':get_max(all)[5],
+                          'most_case':get_max(all)[3],
+                          'average_cost':"{0:.2f}".format(round(total_cost/len(all),2)),
+                          'average_duration':"{0:.2f}".format(round(get_average(all),2)),
+                      })
 
 
 def calc(data):
@@ -155,6 +178,38 @@ def get_rand_risks(risks):
         if i.probability <= r:
             result.append(i.id)
     return result
+
+def get_average(all):
+    duration_avg = 0
+    for key, value in all.items():
+        duration_avg+= value['result']/len(all)
+
+    return duration_avg
+
+def get_max(all):
+    m = -10000000000
+    c = 0
+    m_d = 0
+    m_c = 0
+    count = 0
+    m_selected_risks_ids = False
+    selected_risks_ids= False
+    for key, value in all.items():
+        to_compare = [i.id for i in key]
+        if value['result'] > m:
+            m = value['result']
+            selected_risks_ids = to_compare
+            c = value['cost']
+        if value['count'] > count:
+            m_d = value['result']
+            m_selected_risks_ids = to_compare
+            m_c = value['cost']
+            count = value["count"]
+
+    selected_risks = [models.Risk.objects.get(id=i) for i in selected_risks_ids]
+    m_selected_risks = [models.Risk.objects.get(id=i) for i in m_selected_risks_ids]
+    return selected_risks,m,c,m_selected_risks,m_d,m_c
+
 # def claculate(tasks,new_tasks):
 #     s = self.solve(self.root_node)
 #     self.result = str(s[0])

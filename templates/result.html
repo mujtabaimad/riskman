@@ -3,6 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>results</title>
+
+
+
+
+
+    <script src="//code.jquery.com/jquery-1.12.4.js" charset="UTF-8"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js" charset="UTF-8"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js" charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">
+
+
+
+
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.material.min.js" charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.material.min.css">
+
 </head>
 <body>
 
@@ -29,6 +46,148 @@
     <!--<br>-->
     <!--{% endfor %}-->
 
-    {{worst_case}}
+    {# Load the tag library #}
+    {% load bootstrap3 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+
+    {# Display a form #}
+    <div class="container">
+        <h2>results for case: {{case.name}} in project: {{case.project.name}}</h2>
+        <br>
+        <div class="row" style="text-align: center;">
+            <div class="col-md-4">
+                <h3>
+                    Worst case :
+                    {% for i in worst_case %}
+
+                    <span>{{i.name}} </span>
+
+                    {% endfor %}
+                </h3>
+
+                <br>
+                <div class="row">
+                    <div class="col col-md-6" style="text-align: center;">
+                        <h4>Duration</h4>
+
+                        <h5>{{worst_case_value}} Days</h5>
+                    </div>
+                    <div class="col col-md-6" style="text-align: center;">
+                        <h4>Cost</h4>
+                        <h5>{{worst_case_cost}} SDG</h5>
+                    </div>
+                    <div class="col col-md-6">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <h3>
+                    Most common case :
+                    {% for i in most_case %}
+
+                    <span>{{i.name}} </span>
+
+                    {% endfor %}
+                </h3>
+
+                <br>
+                <div class="row">
+                    <div class="col col-md-6" style="text-align: center;">
+                        <h4>Duration</h4>
+
+                        <h5>{{most_case_value}} Days</h5>
+                    </div>
+                    <div class="col col-md-6" style="text-align: center;">
+                        <h4>Cost</h4>
+                        <h5>{{most_case_cost}} SDG</h5>
+                    </div>
+                    <div class="col col-md-6">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-4">
+                <h3>
+                    Average values
+                </h3>
+
+                <br>
+                <div class="row">
+                    <div class="col col-md-6" style="text-align: center;">
+                        <h4>Duration</h4>
+
+                        <h5>{{average_duration}} Days</h5>
+                    </div>
+                    <div class="col col-md-6" style=" text-align: center;">
+                        <h4>Cost</h4>
+                        <h5>{{average_cost}} SDG</h5>
+                    </div>
+                    <div class="col col-md-6">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <h3>All results</h3>
+            <table class="mdl-data-table" cellspacing="0" width="100%" id="example">
+                <thead>
+                  <tr>
+                    <th>Combination</th>
+                    <th>Duration</th>
+                    <th>Cost</th>
+                    <th>Occurrences</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for key,value in all.items %}
+                    <tr>
+                        <td>{% for i in key %}
+
+                            <span>{{i.name}} </span>
+
+                        {% endfor %}
+                        </td>
+                        <td>{{value.result}}</td>
+                        <td>{{value.cost}}</td>
+                        <td>{{value.count}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+<style>
+
+</style>
+
+
+
+
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        $('#example').DataTable( {
+            columnDefs: [
+                {
+                    targets: [ 0, 1, 2 ],
+                    className: 'mdl-data-table__cell--non-numeric'
+                }
+            ],
+            "lengthMenu": [[25, 50, -1], [25, 50, "All"]],
+        } );
+    } );
+    </script>
 </body>
 </html>
