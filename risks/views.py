@@ -123,16 +123,15 @@ def result(request,id):
                     d = i.duration
                     c = i.cost
                     i_cost+=i.cost
-                    total_cost+=i.cost
                     for j in risks_task:
                         if j.risk.id in risks_to_mod:
                             d+=j.duration
                             c+=j.cost
                             i_cost+=j.cost
-                            total_cost+=j.cost
                     new_tasks[str(i.id)]= {"duration":d,"cost":c,'next':nextTasks}
                     # print(i.name,nextTasks,"==================")
                 res = calc({'new_tasks':new_tasks,'root':tasks[0]})
+                total_cost+=i_cost
 
                 all[tuple(selected_risks)] = {'cost':i_cost,'result':res,'new_tasks':new_tasks,'count':1}
 
@@ -148,7 +147,7 @@ def result(request,id):
                           'most_case_value':get_max(all)[4],
                           'most_case_cost':get_max(all)[5],
                           'most_case':get_max(all)[3],
-                          'average_cost':"{0:.2f}".format(round(total_cost/len(all),2)),
+                          'average_cost':"{0:.2f}".format(round(total_cost/case.number_of_exe,2)),
                           'average_duration':"{0:.2f}".format(round(get_average(all),2)),
                       })
 
@@ -175,7 +174,7 @@ def get_rand_risks(risks):
     result = []
     for i in risks:
         r = random.uniform(0, 100)
-        if i.probability <= r:
+        if i.probability >= r:
             result.append(i.id)
     return result
 

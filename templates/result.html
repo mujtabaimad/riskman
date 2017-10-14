@@ -20,6 +20,10 @@
     <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.material.min.css">
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" charset="UTF-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js" charset="UTF-8"></script>
+
 </head>
 <body>
 
@@ -131,14 +135,13 @@
                         <h4>Cost</h4>
                         <h5>{{average_cost}} SDG</h5>
                     </div>
-                    <div class="col col-md-6">
-
-                    </div>
                 </div>
 
             </div>
         </div>
+
         <div class="row">
+
             <h3>All results</h3>
             <table class="mdl-data-table" cellspacing="0" width="100%" id="example">
                 <thead>
@@ -165,15 +168,27 @@
                 {% endfor %}
                 </tbody>
             </table>
+
+
         </div>
+        <div class="row">
+            <div class="col-md-6">
 
-<style>
+                <canvas id="cost_chart"></canvas>
+            </div>
+            <div class="col-md-6">
 
-</style>
+                <canvas id="duration_chart"></canvas>
+            </div>
+            <div class="col-md-6">
 
+                <canvas id="occ_chart"></canvas>
+            </div>
+            <div class="col-md-12">
 
-
-
+                <canvas id="duration_cost_chart"></canvas>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -188,6 +203,110 @@
             "lengthMenu": [[25, 50, -1], [25, 50, "All"]],
         } );
     } );
+
+
     </script>
+
+<script>
+var ctx = document.getElementById("cost_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        label:'Costs values',
+        labels: [{% for key,value in all.items %}'{% for i in key %}{{i.name}} {% endfor %}',{% endfor %}],
+        datasets: [{
+            data: [{% for key,value in all.items %}{{value.cost}},{% endfor %}],
+            "borderColor":"rgb(0, 255, 0)",
+            "label":"Cost",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Cost Chart'
+        }
+    }
+});
+
+var ctx = document.getElementById("duration_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+        label:'Duration values',
+    data: {
+        labels: [{% for key,value in all.items %}'{% for i in key %}{{i.name}} {% endfor %}',{% endfor %}],
+        datasets: [{
+            data: [{% for key,value in all.items %}{{value.result}},{% endfor %}],
+            "borderColor":"rgb(255, 0, 0)",
+            "label":"Duration",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Duration Chart'
+        }
+    }
+});
+var ctx = document.getElementById("occ_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for key,value in all.items %}'{% for i in key %}{{i.name}} {% endfor %}',{% endfor %}],
+        datasets: [{
+            data: [{% for key,value in all.items %}{{value.count}},{% endfor %}],
+            "borderColor":"rgb(0, 0, 255)",
+            "label":"Occurrences",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Occurrences Chart'
+        }
+    }
+});
+
+
+var ctx = document.getElementById("duration_cost_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for key,value in all.items %}'{% for i in key %}{{i.name}} {% endfor %}',{% endfor %}],
+        datasets: [{
+            data: [{% for key,value in all.items %}{{value.result}},{% endfor %}],
+            "borderColor":"rgb(255, 0, 0)",
+            "label":"Duration",
+            borderWidth: 1
+        },{
+            data: [{% for key,value in all.items %}{{value.cost}},{% endfor %}],
+            "borderColor":"rgb(0, 255, 0)",
+            "label":"Cost",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Duration & Cost Chart'
+        }
+    }
+});
+<!--var myChart = new Chart(ctx, {-->
+    <!--type: 'area',-->
+
+    <!--options: {-->
+        <!--scales: {-->
+            <!--yAxes: [{-->
+                <!--ticks: {-->
+                    <!--beginAtZero:true-->
+                <!--}-->
+            <!--}]-->
+        <!--}-->
+    <!--}-->
+<!--});-->
+</script>
 </body>
 </html>
