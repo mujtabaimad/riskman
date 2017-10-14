@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'risks',
     'chartit',
     'bootstrap3',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [

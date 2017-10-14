@@ -27,28 +27,6 @@
 </head>
 <body>
 
-    <!--{% for i in all %}-->
-    <!--&lt;!&ndash;{{i}}&ndash;&gt;-->
-
-    <!--{% for j in i.tasks %}-->
-        <!--{{j.name}}-->
-        <!--<br>-->
-        <!--{{j.duration}}-->
-        <!--<br>-->
-        <!--{{j.cost}}-->
-        <!--<br>-->
-
-    <!--{% endfor %}-->
-
-    <!--{{i.new_tasks}}-->
-    <!--{{i.result}}-->
-
-    <!--{{i.mod}}-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--<br>-->
-    <!--{% endfor %}-->
 
     {# Load the tag library #}
     {% load bootstrap3 %}
@@ -59,7 +37,7 @@
 
     {# Display django.contrib.messages as Bootstrap alerts #}
     {% bootstrap_messages %}
-
+    {% load mathfilters %}
     {# Display a form #}
     <div class="container">
         <h2>results for case: {{case.name}} in project: {{case.project.name}}</h2>
@@ -139,6 +117,17 @@
 
             </div>
         </div>
+        <div class="row" style="text-align:center;">
+            <h3>standard deviation</h3>
+            <div class="col-md-6">
+                <h4>Duration</h4>
+                {{sd_duration}}
+            </div>
+            <div class="col-md-6">
+                <h4>Cost</h4>
+                {{sd_cost}}
+            </div>
+        </div>
 
         <div class="row">
 
@@ -150,6 +139,7 @@
                     <th>Duration</th>
                     <th>Cost</th>
                     <th>Occurrences</th>
+                    <th>Critical Index</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,6 +154,7 @@
                         <td>{{value.result}}</td>
                         <td>{{value.cost}}</td>
                         <td>{{value.count}}</td>
+                        <td>{{value.count|div:case.number_of_exe }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -184,7 +175,15 @@
 
                 <canvas id="occ_chart"></canvas>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-6">
+
+                <canvas id="duration_frq_chart"></canvas>
+            </div>
+            <div class="col-md-6">
+
+                <canvas id="cost_frq_chart"></canvas>
+            </div>
+            <div class="col-md-6">
 
                 <canvas id="duration_cost_chart"></canvas>
             </div>
@@ -249,6 +248,47 @@ var myLineChart = new Chart(ctx, {
         }
     }
 });
+var ctx = document.getElementById("duration_frq_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+        label:'Durations frequency',
+    data: {
+        labels: [{% for i in durations_k%}'{{i}}',{% endfor %}],
+        datasets: [{
+            data: [{% for i in durations_v%}'{{i}}',{% endfor %}],
+            "borderColor":"rgb(255, 0, 255)",
+            "label":"frequency",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Durations frequencies Chart'
+        }
+    }
+});
+var ctx = document.getElementById("cost_frq_chart").getContext('2d');
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+        label:'Costs frequency',
+    data: {
+        labels: [{% for i in costs_k%}'{{i}}',{% endfor %}],
+        datasets: [{
+            data: [{% for i in costs_v%}'{{i}}',{% endfor %}],
+            "borderColor":"rgb(255, 255, 0)",
+            "label":"frequency",
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: {
+            display: true,
+            text: 'Costs frequencies Chart'
+        }
+    }
+});
+
 var ctx = document.getElementById("occ_chart").getContext('2d');
 var myLineChart = new Chart(ctx, {
     type: 'line',
@@ -294,19 +334,6 @@ var myLineChart = new Chart(ctx, {
         }
     }
 });
-<!--var myChart = new Chart(ctx, {-->
-    <!--type: 'area',-->
-
-    <!--options: {-->
-        <!--scales: {-->
-            <!--yAxes: [{-->
-                <!--ticks: {-->
-                    <!--beginAtZero:true-->
-                <!--}-->
-            <!--}]-->
-        <!--}-->
-    <!--}-->
-<!--});-->
 </script>
 </body>
 </html>
